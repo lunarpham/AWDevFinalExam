@@ -12,6 +12,19 @@ class CategoryRepo {
         }
     }
 
+    public function getCategory($cateId) {
+        return auth()->user()->categories()->find($cateId);
+    }
+
+    public function updateCategory($cateId, $editedCategory) {
+        $category = $this->getCategory($cateId);
+        return $category->update([ 'category' => $editedCategory ]);
+    }
+
+    public function deleteCategory($cateId) {
+        return $this->getCategory($cateId)->delete();
+    }
+
     public function fetchAllCategories() {
         $categories = auth()->user()->categories()->latest()->paginate();
         return $categories;

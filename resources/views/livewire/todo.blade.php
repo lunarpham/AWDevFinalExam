@@ -32,7 +32,18 @@
 
         <div>
             @if ($edit == $todo->id)
-            <x-text-input wire:model='editedTodo' class="w-full mr-2"/>
+            <div class="flex">
+                <select wire:model='editedCategory' class="rounded-md mr-2">
+                        <option value="">None</option>
+                        @forelse($categories as $category)
+                            <option value="{{$category->id}}">{{$category->category}}</option>
+                        @empty
+                            
+                        @endforelse
+                </select>
+                <x-text-input wire:model='editedTodo' class="w-full mr-2"/>
+            </div>
+            
 
             @else
             <div class="flex flex-col">
@@ -59,7 +70,7 @@
             <button class="bg-red-800 text-white px-4 py-2 rounded-md" wire:click='cancelEdit'>Cancel</button>
             
             @else
-            <button @if($todo->is_completed) class="bg-slate-400 text-white px-4 py-2 rounded-md" @endif class='bg-green-700 text-white px-4 py-2 rounded-md' wire:click='markCompleted({{ $todo->id }})'>Check</button>
+            <button @if($todo->is_completed) class="bg-slate-400 text-white px-4 py-2 rounded-md" @endif class='bg-green-700 text-white px-4 py-2 rounded-md' wire:click='markCompleted({{ $todo->id }})'>@if($todo->is_completed) Uncheck @else Check @endif</button>
             <button wire:click='editTodo({{ $todo->id }})' class="bg-indigo-500 text-white px-4 py-2 rounded-md">Edit</button>
             <button wire:click='deleteTodo({{ $todo->id }})' class="bg-red-800 text-white px-4 py-2 rounded-md">Delete</button>
             @endif

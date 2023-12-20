@@ -21,9 +21,9 @@ class TodoRepo {
         return $todos;
     }
 
-    public function update($todoId, $editedTodo) {
+    public function update($todoId, $editedTodo, $editedCategory) {
         $todo = $this->getTodo($todoId);
-        return $todo->update([ 'todo' => $editedTodo ]);
+        return $todo->update([ 'todo' => $editedTodo, 'category_id' => $editedCategory ]);
     }
 
     public function completed($todoId) {

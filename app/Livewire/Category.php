@@ -13,6 +13,9 @@ class Category extends Component
     #[Rule('required|min:3')] public $category = '';
     public $color = '';
 
+    #[Rule('required|min:3')] public $editedCategory;
+    public $editCategory;
+
     public function boot(CategoryRepo $categoryRepo) {
         $this->categoryRepo = $categoryRepo;
     }
@@ -25,6 +28,25 @@ class Category extends Component
         $this->categoryRepo->saveCategory($validatedCategory);
         $this->category = '';
         $this->color = '#ff0000';
+    }
+
+    public function editCategoryButton($cateId) {
+        $this->editCategory = $cateId;
+        $this->editedCategory = $this->categoryRepo->getCategory($cateId)->category;
+    }
+
+    public function updateCategoryButton($cateId) {
+        $validatedCategory = $this->validateOnly('editedCategory');
+        $this->categoryRepo->updateCategory($cateId, $validatedCategory['editedCategory']);
+        $this->cancelCategoryEdit();
+    }
+
+    public function deleteCategoryButton($cateId) {
+        $this->categoryRepo->deleteCategory($cateId);
+    }
+
+    public function cancelCategoryEdit() {
+        $this->editCategory = '';
     }
 
     public function render()

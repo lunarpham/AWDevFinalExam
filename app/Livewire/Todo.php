@@ -3,27 +3,37 @@
 namespace App\Livewire;
 
 use App\Repo\TodoRepo;
+use App\Repo\CategoryRepo;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
+use Symfony\Contracts\Service\Attribute\Required;
 
 class Todo extends Component
 {
     protected $repo;
-    #[Rule('required|min:3')]   //Required at least 3 character to create a task
-    public $todo = '';
-    #[Rule('required|min:3')]
-    public $editedTodo;
+    protected $categoryRepo;
+    #[Rule('required|min:3')] public $todo = '';
+    public $category_id = null;
+    #[Rule('required|min:3')] public $editedTodo;
     public $edit;
 
-    public function boot(TodoRepo $repo) {
+    public function boot(TodoRepo $repo, CategoryRepo $categoryRepo) {
         $this->repo = $repo;
+        $this->categoryRepo = $categoryRepo;
     }
 
     public function addTodo() {
-        $validated = $this->validateOnly('todo');
+        $validated = $this->validate([
+            'todo' => 'required|min:3',
+            'category_id' => 'exists:categories,id|nullable',
+        ]);
+        $this->category_id = ($validated['category_id'] == 0) ? null : $validated['category_id'];
+
         $this->repo->save($validated);
         $this->todo = '';
+        $this->category_id = null;
     }
+    
 
     public function editTodo($todoId) {
         $this->edit = $todoId;
@@ -51,7 +61,8 @@ class Todo extends Component
     public function render()
     {
         $todos = $this->repo->fetchAll();
-        return view('livewire.todo', compact('todos'));
+        $categories = $this->categoryRepo->fetchAllCategories();
+        return view('livewire.todo', compact('todos','categories'));
     }
 
 }

@@ -1,11 +1,19 @@
 <div>
-    <script src="https://kit.fontawesome.com/e2653b8883.js" crossorigin="anonymous"></script>
+    <h1 class="my-3 text-xl font-bold">Todos</h1>
     <div class="flex justify-center">
     <x-input-error :messages="$errors->get('todo')" class="mt-2" />
     </div>
  
     <form class="flex" method="POST" wire:submit.prevent='addTodo'> <!--input cannot be empty-->
-    <x-text-input wire:model='todo' class="w-full mr-2"/>
+        <x-text-input wire:model='todo' class="w-full mr-2"/>
+        <select wire:model='category_id' class="rounded-md mr-2">
+                <option value="0">None</option>
+            @forelse($categories as $category)
+                <option value="{{$category->id}}">{{$category->category}}</option>
+            @empty
+                
+            @endforelse
+        </select>
     <x-primary-button >
         Add
     </x-primary-button>
@@ -28,7 +36,15 @@
 
             @else
             <div class="flex flex-col">
-                <span @if($todo->is_completed) class='line-through font-medium' @endif class='font-bold'>{{ $todo->todo }}</span>
+                <div class="flex items-center">
+                    @if($todo->category == null)
+                    <div></div>
+                    @else
+                    <div class="flex text-white py-1 px-4 text-xs font-bold uppercase rounded-sm text-center mr-2" style="background-color:{{$todo->category->color}}">{{ $todo->category->category }}</div>
+                    @endif
+                    <span @if($todo->is_completed) class='line-through font-medium' @endif class='font-bold'>{{ $todo->todo }}</span>
+                </div>
+                
                 <span class="text-gray-400">Created at {{ $todo->created_at }}</span>
             </div>
             
@@ -51,6 +67,7 @@
         
         
     </div>
+
     @empty
         
     @endforelse

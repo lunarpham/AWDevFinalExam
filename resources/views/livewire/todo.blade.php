@@ -41,7 +41,11 @@
                             
                         @endforelse
                 </select>
-                <x-text-input wire:model='editedTodo' class="w-full mr-2"/>
+                <div class="flex-col">
+                    <x-text-input wire:model='editedTodo' class="w-full mr-2"/>
+                    <x-input-error :messages="$errors->get('editedTodo')"/>
+                </div>
+                
             </div>
             
 

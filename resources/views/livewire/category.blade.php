@@ -11,12 +11,12 @@
             Add
         </x-primary-button>
     </form>
-    <div class="flex gap-1">
+    <div class="flex gap-1 flex-wrap">
         @forelse($categories as $category)
 
         <div class="flex my-4 text-white py-1 px-4 text-xs font-bold uppercase rounded-sm items-center justify-between" style="background-color:{{$category->color}}">
             @if($editCategory == $category->id)
-            <input wire:model='editedCategory' class="mr-2 text-black"/>
+            <x-text-input wire:model='editedCategory' class="mr-2 text-black"/>
             @else
             <span class='font-medium mr-3'>{{ $category->category }}</span>
             @endif
@@ -40,5 +40,6 @@
             
         @endforelse
     </div>
+    <x-input-error :messages="$errors->get('editedCategory')"/>
 
 </div>

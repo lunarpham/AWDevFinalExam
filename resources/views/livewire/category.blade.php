@@ -15,10 +15,20 @@
         @forelse($categories as $category)
 
         <div class="flex my-4 text-white py-1 px-4 text-xs font-bold uppercase rounded-sm items-center justify-between" style="background-color:{{$category->color}}">
+            @if($editCategory == $category->id)
+            <input wire:model='editedCategory' class="mr-2 text-black"/>
+            @else
             <span class='font-medium mr-3'>{{ $category->category }}</span>
+            @endif
             <div>
-                <button class="opacity-50">Edit</button>
-                <button class="opacity-50">Delete</button>
+                @if($editCategory == $category->id)
+                <button class="opacity-50" wire:click='updateCategoryButton({{$category->id}})'>Update</button>
+                <button class="opacity-50" wire:click='cancelCategoryEdit'>Cancel</button>
+
+                @else
+                <button class="opacity-50" wire:click='editCategoryButton({{$category->id}})'>Edit</button>
+                <button class="opacity-50" wire:click='deleteCategoryButton({{$category->id}})'>Delete</button>
+                @endif
             </div>
             
         </div>

@@ -15,6 +15,9 @@ class Todo extends Component
     #[Rule('required|min:3')] public $todo = '';
     public $category_id = null;
     #[Rule('required|min:3')] public $editedTodo;
+    public $editedCategory;
+
+    public $validatedCategory = null;
     public $edit;
 
     public function boot(TodoRepo $repo, CategoryRepo $categoryRepo) {
@@ -38,11 +41,20 @@ class Todo extends Component
     public function editTodo($todoId) {
         $this->edit = $todoId;
         $this->editedTodo = $this->repo->getTodo($todoId)->todo;
+        $this->editedCategory = $this->repo->getTodo($todoId)->category_id;
     }
 
     public function updateTodo($todoId) {
-        $validated = $this->validateOnly('editedTodo');
-        $this->repo->update($todoId, $validated['editedTodo']);
+        $validated = $this->validate([
+            'editedTodo' => 'required|min:3',
+            'editedCategory' => 'nullable|exists:categories,id',
+        ]);
+
+        if ($validated['editedCategory'] === '') {
+            $validated['editedCategory'] = null;
+        }
+        
+        $this->repo->update($todoId, $validated['editedTodo'], $validated['editedCategory']);
         $this->cancelEdit();
     }
 

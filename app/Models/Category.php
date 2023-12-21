@@ -11,6 +11,13 @@ class Category extends Model
 
     protected $guarded = [];
 
+    protected $fillable = [
+        'user_id',
+        'category',
+        'color',
+    ];
+
+
     public function todos()
     {
         return $this->hasMany(Todo::class);

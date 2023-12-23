@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class TodoController extends Controller
 {
@@ -40,20 +42,30 @@ class TodoController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'todo' => 'required|max:255',
-            'user_id' => 'required|exists:users,id',
-            'category_id' => 'required|exists:categories,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'todo' => 'required|max:255',
+                'user_id' => 'required|exists:users,id',
+                'category_id' => [
+                    'required',
+                    Rule::exists('categories', 'id')->where(function ($query) use ($request) {
+                        $query->where('id', $request->category_id)->where('user_id', $request->user_id);
+                    }),
+                ],
+            ]);
+            
+            $todo = Todo::create($validated);
 
-        if ($validated['category_id']) {
-            $category = Category::find($validated['category_id']);
-            if (!$category || $category->user_id !== Auth::id()) {
-                return response()->json(['error' => 'Unauthorized. Category does not belong to the authenticated user.'], 403);
-            }
+            return response()->json(['message' => 'Todo created successfully', 'data' => $todo], 201);
         }
-
-        return Todo::create($validated);
+        
+        catch (ValidationException $e) {
+            // Custom error message for validation failure
+            return response()->json(['error' => $e->validator->errors()->first()], 422);
+        } catch (\Exception $e) {
+            // Custom error message for other failures
+            return response()->json(['error' => 'Failed to create Todo'], 500);
+        }
     }
 
     /**

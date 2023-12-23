@@ -18,11 +18,15 @@ class TodoFactory extends Factory
      */
     public function definition(): array
     {
+        //random existed user id
+        $userId = User::inRandomOrder()->first()->id;
+        //random category_id that belongs to user_id
+        $categoryId = Category::where('user_id', $userId)->inRandomOrder()->first()->id;
         return [
-            'user_id' => User::factory(),
-            'todo' => fake()->paragraph(),
+            'user_id' => $userId,
+            'todo' => fake()->sentence(),
             'is_completed' => fake()->boolean(),
-            'category_id' => Category::factory(),
+            'category_id' => $categoryId,
         ];
     }
 }

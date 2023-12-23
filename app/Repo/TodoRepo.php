@@ -21,6 +21,11 @@ class TodoRepo {
         return $todos;
     }
 
+    public function fetchByCategory($selectedCategory) {
+        $filterdTodos = auth()->user()->todos()->latest()->where('category_id', $selectedCategory)->paginate();
+        return $filterdTodos;
+    }
+
     public function update($todoId, $editedTodo, $editedCategory) {
         $todo = $this->getTodo($todoId);
         return $todo->update([ 'todo' => $editedTodo, 'category_id' => $editedCategory ]);

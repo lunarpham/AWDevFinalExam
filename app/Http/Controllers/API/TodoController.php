@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Todo;
+use App\Models\User;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -10,15 +11,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Policies\TodoPolicy;
 
 class TodoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, User $user, Todo $todo)
     {
-        $query = Todo::query()
+        $this->authorize('update',$request->user(), $todo);
+        $query = auth()->user()->todos()
             ->when(request('with'), function (Builder $query, $with) {
                 $query->with(explode(',', $with));
             })
@@ -80,7 +83,7 @@ class TodoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Todo $todo)
+    public function update(Request $request, Todo $todo, User $user)
     {
         $validated = $request->validate([
             'todo' => 'nullable|max:255',
